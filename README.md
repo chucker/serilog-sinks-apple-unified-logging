@@ -34,4 +34,45 @@ This project attempts to map Serilog's various concepts such as log event levels
 
 ### Source contexts / categories
 
+| Serilog concept | Unified Logging concept |
+|-----------------|-------------------------|
+| SourceContext   | Category                |
 
+One common pattern of how you might use this: first, make an instance (or static) variable `Log` in your class:
+
+```csharp
+public class MyMusicPlayer
+{
+    readonly ILogger Log = Serilog.Log.ForContext<MyMusicPlayer>();
+}
+```
+
+Notice how we're passing the class name as a generic type to `ForContext<T>`.
+
+Second, call a method on `Log`:
+
+```csharp
+public void Play()
+{
+    Playback.Start();
+
+    Log.Debug("PlayerState is now {this.PlayerState}");
+}
+```
+
+The log message will implicitly have the special property **SourceContext** set to `MyMusicPlayer`.
+
+Now, when you launch Console, you can:
+
+* show the **Category** column
+* filter by it, such as by typing `category:MyMusicPlayer` in the search field and hitting return.
+
+### Subsystems
+
+Currently, Unified Logging's **Subsystem** will map to the bundle ID of the current process.
+
+## Potential improvements
+
+This is just a fairly simple, straightforward implementation so far.
+
+Both Serilog and Unified Logging offer additional features that this won't cover just yet, such as structured logging (this will just output plain text, for the most part) and signposts.
